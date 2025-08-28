@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>✨ Cute Countdown (Locked)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E⏳%3C/text%3E%3C/svg%3E"/>
+  <style>
+    :root{
+      --bg1:#0f172a; --bg2:#1e293b; --glass:#ffffff12; --glass-strong:#ffffff22;
+      --text:#e5e7eb; --muted:#9ca3af; --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --accent:#a78bfa; --accent2:#22d3ee; --good:#34d399; --warn:#f43f5e;
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{
+      margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 20% 10%, #1f2937 0%, var(--bg1) 40%),
+                  radial-gradient(800px 600px at 80% 0%, #0ea5e9 0%, transparent 50%),
+                  radial-gradient(800px 600px at 0% 100%, #8b5cf6 0%, transparent 50%),
+                  linear-gradient(160deg, var(--bg1), var(--bg2));
+      display:grid; place-items:center; padding: clamp(16px, 3.5vw, 36px);
+    }
+    .app{ width:min(820px, 100%); }
+    .card{ backdrop-filter: blur(10px) saturate(140%);
+      background: linear-gradient(180deg, var(--glass), transparent);
+      border:1px solid var(--glass-strong); border-radius:28px; box-shadow: var(--shadow);
+      padding: clamp(18px, 3.2vw, 36px);
+    }
+    header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: clamp(14px, 2.2vw, 24px); }
+    .title{ display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.3px; font-size: clamp(18px, 3.2vw, 28px); }
+    .pill{ border:1px solid var(--glass-strong); background: linear-gradient(180deg, #ffffff10, transparent);
+      padding: 8px 12px; border-radius:999px; color: var(--muted); font-size: 13px; }
+    .target{ margin: 4px 0 0 0; font-size: 13px; color:var(--muted); }
+
+    .grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: clamp(10px, 2vw, 18px); }
+    @media (max-width: 520px){ .grid{ grid-template-columns: repeat(2, 1fr);} }
+    .unit{ position:relative; border-radius:24px; border:1px solid var(--glass-strong);
+      padding: 18px 14px 14px; background: linear-gradient(180deg, #ffffff10, #ffffff05);
+      text-align:center; overflow:hidden; }
+    .label{ font-size: 12px; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); }
+    .value{ font-variant-numeric: tabular-nums; font-weight: 800; line-height:1;
+      font-size: clamp(40px, 10vw, 80px); margin: 6px 0 2px; text-shadow: 0 6px 30px #00000055; }
+    .unit::after{ content:""; position:absolute; inset:-40% -60% auto auto; height:200%; width:120%;
+      background: conic-gradient(from 0deg, transparent, rgba(255,255,255,.08), transparent 30%);
+      transform: rotate(8deg); animation: spin 8s linear infinite; pointer-events:none; }
+    @keyframes spin { to { transform: rotate(368deg);} }
+
+    .celebrate{ display:none; text-align:center; padding: 24px; }
+    .celebrate h2{ font-size: clamp(26px, 7vw, 40px); margin: 0 0 8px}
+    .celebrate p{ color:var(--muted); margin:0 }
+
+    /* Password gate overlay */
+    .gate{
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      padding:24px; z-index:50;
+      background: radial-gradient(1000px 700px at 20% 10%, #1f2937 0%, rgba(15,23,42,.96) 40%),
+                  radial-gradient(700px 500px at 80% 0%, rgba(34,211,238,.2), transparent 60%),
+                  radial-gradient(700px 500px at 0% 100%, rgba(167,139,250,.2), transparent 60%),
+                  linear-gradient(160deg, rgba(15,23,42,.98), rgba(30,41,59,.98));
+      backdrop-filter: blur(6px);
+    }
+    .panel{
+      width:min(520px, 100%); border-radius:24px; border:1px solid var(--glass-strong);
+      background: linear-gradient(180deg, #ffffff10, #ffffff05); box-shadow: var(--shadow);
+      padding: clamp(18px, 3.2vw, 28px);
+      text-align:center;
+      animation: pop .38s cubic-bezier(.2,.8,.2,1);
+    }
+    @keyframes pop{ from{ transform:scale(.96); opacity:0 } to{ transform:scale(1); opacity:1 } }
+    .panel h1{ margin:.2rem 0 .4rem; font-size: clamp(20px, 5.4vw, 28px) }
+    .panel p{ margin:.2rem 0 1rem; color:var(--muted) }
+    .input{
+      display:flex; gap:10px; align-items:center; justify-content:center;
+      background: #0b1220; border:1px solid #223; border-radius:14px; padding:8px 10px;
+    }
+    .input input{
+      flex:1; font-size:16px; border:none; outline:none; background:transparent; color:var(--text);
+      padding:8px 6px;
+    }
+    .btn{
+      appearance:none; border:none; cursor:pointer; padding:10px 14px; border-radius:14px; font-weight:700;
+      color:#0b1220; background: linear-gradient(180deg, #ffffff, #dbeafe);
+      box-shadow: 0 6px 14px rgba(0,0,0,.25), inset 0 1px 0 #ffffff;
+    }
+    .err{ color:var(--warn); font-size:13px; min-height:1.2em; margin-top:8px }
+    .shake{ animation: shake .28s ease-in-out }
+    @keyframes shake{ 0%{transform:translateX(0)} 25%{transform:translateX(-6px)} 50%{transform:translateX(6px)} 75%{transform:translateX(-4px)} 100%{transform:translateX(0)} }
+    .hidden{ display:none !important; }
+  </style>
+</head>
+<body>
+  <!-- GATE OVERLAY -->
+  <div class="gate" id="gate">
+    <div class="panel" id="panel">
+      <h1>🔒 Enter Password</h1>
+      <p>Type the magic word to continue.</p>
+      <div class="input">
+        <input id="pw" type="password" inputmode="text" autocomplete="off" placeholder="Password" aria-label="Password" />
+        <button class="btn" id="unlock">Unlock</button>
+      </div>
+      <div class="err" id="err"></div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <main class="app hidden" id="app">
+    <div class="card">
+      <header>
+        <div>
+          <div class="title">The best Day Ever With My Sekretik</div>
+          <p class="target" id="targetText">Target: –</p>
+        </div>
+        <span class="pill" id="statusPill">Locked</span>
+      </header>
+
+      <section id="timer">
+        <div class="grid" role="timer" aria-live="polite">
+          <div class="unit" aria-label="Days"><div class="label">Days</div><div class="value" id="d">00</div></div>
+          <div class="unit" aria-label="Hours"><div class="label">Hours</div><div class="value" id="h">00</div></div>
+          <div class="unit" aria-label="Minutes"><div class="label">Minutes</div><div class="value" id="m">00</div></div>
+          <div class="unit" aria-label="Seconds"><div class="label">Seconds</div><div class="value" id="s">00</div></div>
+        </div>
+      </section>
+
+      <section class="celebrate" id="done">
+        <h2>🎉 YOU MADE IT !</h2>
+        <p>Enjoy your Friday night ✨</p>
+      </section>
+    </div>
+  </main>
+
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    // Target: Friday, Aug 29, 2025 at 10:35 PM (device local time)
+    const TARGET = new Date(2025, 7, 29, 22, 35, 0); // 0-based month
+    // Simple hash of the password "franchesca" to avoid plain text check
+    // (not real security, just to keep the string out of view)
+    const OK_HASH = "50655ee52556a69c4672d044455ca85b153aefac5d46b6bbba24b014fe523369"; // sha256("franchesca")
+
+    const app = document.getElementById('app');
+    const gate = document.getElementById('gate');
+    const panel = document.getElementById('panel');
+    const pwInput = document.getElementById('pw');
+    const unlockBtn = document.getElementById('unlock');
+    const err = document.getElementById('err');
+
+    const dEl = document.getElementById('d');
+    const hEl = document.getElementById('h');
+    const mEl = document.getElementById('m');
+    const sEl = document.getElementById('s');
+    const targetText = document.getElementById('targetText');
+    const statusPill = document.getElementById('statusPill');
+    const timerSection = document.getElementById('timer');
+    const doneSection = document.getElementById('done');
+
+    // Human-readable target
+    try{
+      const fmt = new Intl.DateTimeFormat(undefined, {weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'numeric', minute:'2-digit'});
+      targetText && (targetText.textContent = 'Target: ' + fmt.format(TARGET));
+    }catch(e){ targetText && (targetText.textContent = 'Target: ' + TARGET.toString()); }
+
+    let finished = false;
+    const pad = (n)=> String(n).padStart(2,'0');
+
+    function showCelebration(){
+      statusPill.textContent = 'Done';
+      timerSection.style.display = 'none';
+      doneSection.style.display = 'block';
+      party();
+      if (navigator.vibrate) { navigator.vibrate([100, 80, 100]); }
+    }
+
+    function tick(){
+      const now = new Date();
+      let diff = TARGET.getTime() - now.getTime();
+      if (diff <= 0){
+        if(!finished){
+          finished = true;
+          dEl.textContent = '00'; hEl.textContent = '00'; mEl.textContent = '00'; sEl.textContent = '00';
+          showCelebration();
+        }
+        return;
+      }
+      const days = Math.floor(diff / 86400000); diff -= days * 86400000;
+      const hours = Math.floor(diff / 3600000); diff -= hours * 3600000;
+      const mins = Math.floor(diff / 60000); diff -= mins * 60000;
+      const secs = Math.floor(diff / 1000);
+      dEl.textContent = pad(days); hEl.textContent = pad(hours); mEl.textContent = pad(mins); sEl.textContent = pad(secs);
+    }
+
+    function startCountdown(){
+      gate.classList.add('hidden');
+      app.classList.remove('hidden');
+      statusPill.textContent = 'Live';
+      tick();
+      window._iv = setInterval(tick, 1000);
+    }
+
+    // Hash helper using SubtleCrypto
+    async function sha256(text){
+      const enc = new TextEncoder().encode(text);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+
+    async function tryUnlock(){
+      err.textContent = '';
+      const entered = pwInput.value || '';
+      try{
+        const hash = await sha256(entered);
+        console.log("the entered is ;;; ", hash)
+        if (hash === OK_HASH){
+          startCountdown();
+          if (navigator.vibrate) { navigator.vibrate(40); }
+        } else {
+          err.textContent = 'Wrong password. Try again.';
+          panel.classList.remove('shake'); void panel.offsetWidth; panel.classList.add('shake');
+          if (navigator.vibrate) { navigator.vibrate(20); }
+        }
+      }catch(e){
+        // Fallback if crypto API is blocked (rare). Plain compare.
+        if (entered === 'franchesca'){ startCountdown(); }
+        else { err.textContent = 'Wrong password. Try again.'; }
+      }
+    }
+
+    // Events
+    unlockBtn.addEventListener('click', tryUnlock);
+    pwInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') tryUnlock(); });
+
+    // Focus input once UI is painted
+    window.addEventListener('load', ()=> { setTimeout(()=> pwInput.focus(), 80); });
+
+    // Confetti
+    function party(){
+      const root = document.getElementById('confetti');
+      const colors = ['#22d3ee', '#60a5fa', '#a78bfa', '#f472b6', '#f59e0b', '#34d399'];
+      const count = Math.min(160, Math.floor(window.innerWidth * 0.6));
+      for (let i=0;i<count;i++){
+        const piece = document.createElement('i');
+        const size = 6 + Math.random()*10;
+        piece.style.width = size+'px';
+        piece.style.height = (size*1.4)+'px';
+        piece.style.left = (Math.random()*100)+'%';
+        piece.style.background = colors[i % colors.length];
+        piece.style.borderRadius = (Math.random()>.6? '2px' : '50%');
+        piece.style.filter = 'drop-shadow(0 2px 2px rgba(0,0,0,.4))';
+        piece.style.animation = `fall ${6+Math.random()*4}s linear forwards`;
+        piece.style.animationDelay = (Math.random()*0.5)+'s';
+        root.appendChild(piece);
+      }
+      setTimeout(()=> root.innerHTML = '', 12000);
+    }
+  </script>
+
+  <noscript>
+    <div style="max-width:720px;margin:1rem auto;padding:1rem;border-radius:12px;background:#111827;color:#e5e7eb;font-family:system-ui">
+      JavaScript is disabled. Open this page in Safari and enable JavaScript to use the countdown.
+    </div>
+  </noscript>
+</body>
+</html>
